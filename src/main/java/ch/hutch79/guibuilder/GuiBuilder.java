@@ -29,21 +29,18 @@ public class GuiBuilder {
     }
 
     /**
-     * @param name Name of the Config file without ending
+     * @param name Name of the Config file with a file extension
      * @param replace Copy Default config on first create?
      */
     public void createConfig(String name, boolean replace) {
-        name = name + ".yml";
         configManager.createConfig(name, replace);
     }
 
     /**
-     * @param name Name of the Config file without ending
+     * @param name Name of the Config file with a file extension
      * @return List of all found GUIs in given config file
      */
     public List<String> readConfig(String name) {
-
-
         FileConfiguration guiConfig = configManager.getConfig(name);
         Bukkit.getConsoleSender().sendMessage("GuiBuilder!!!!!");
 
