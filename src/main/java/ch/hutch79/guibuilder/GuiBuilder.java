@@ -4,24 +4,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 public class GuiBuilder {
 
-    private static JavaPlugin main;
 
-    private static HashMap<UUID, HashMap<String, Inventory>> playerGuis = new HashMap<UUID, HashMap<String, Inventory>>();
-    private static HashMap<String, StoreGui> guis = new HashMap<>();
-
-    /**
-     * @param mainClass Main Plugin Instance
-     */
-    public void GuiBuilderInit(JavaPlugin mainClass) {
-        main = mainClass;
-        Bukkit.getConsoleSender().sendMessage(String.valueOf(main));
-    }
+    private static final HashMap<UUID, HashMap<String, Inventory>> playerGuis = new HashMap<>();
+    private static final HashMap<String, StoreGui> guis = new HashMap<>();
 
     public void createGui(String name, int guiSize) {
         ItemStack[] itemStack = new ItemStack[guiSize];

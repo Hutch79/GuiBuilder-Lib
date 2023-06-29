@@ -5,8 +5,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class StoreGui {
     private String name;
-    private int size;
-    private ItemStack[] items;
+    private final int size;
+    private final ItemStack[] items;
 
     StoreGui(String name, int size, ItemStack[] items) {
         this.name = name;
