@@ -1,7 +1,6 @@
 package ch.hutch79.guibuilder;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +12,7 @@ public class GuiBuilder {
 
     private static JavaPlugin main;
 
-    private static HashMap<Player, HashMap<String, Inventory>> playerGuis = new HashMap<>();
+    private static HashMap<UUID, HashMap<String, Inventory>> playerGuis = new HashMap<UUID, HashMap<String, Inventory>>();
     private static HashMap<String, StoreGui> guis = new HashMap<>();
 
     /**
@@ -39,8 +38,9 @@ public class GuiBuilder {
 
 
     public void openGui(Player player, String gui) {
-        if (playerGuis.containsKey(player) && playerGuis.get(player).containsKey(gui)) {
-            player.openInventory(playerGuis.get(player).get(gui));
+        UUID uuid = player.getUniqueId();
+        if (playerGuis.containsKey(uuid) && playerGuis.get(uuid).containsKey(gui)) {
+            player.openInventory(playerGuis.get(uuid).get(gui));
             return;
         }
 
@@ -51,6 +51,6 @@ public class GuiBuilder {
         temp.put(gui, inv);
 
         player.openInventory(inv);
-        playerGuis.put(player, temp);
+        playerGuis.put(uuid, temp);
     }
 }
