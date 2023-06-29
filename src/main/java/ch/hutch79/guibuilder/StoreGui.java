@@ -25,4 +25,8 @@ public class StoreGui {
     protected ItemStack[] getItems() {
         return this.items;
     }
+
+    protected void setName (String newName) {
+        this.name = newName;
+    }
 }
