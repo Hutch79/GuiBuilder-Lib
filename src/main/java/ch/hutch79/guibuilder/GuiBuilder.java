@@ -1,6 +1,7 @@
 package ch.hutch79.guibuilder;
 
 
+import com.sun.istack.internal.NotNull;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -119,9 +120,11 @@ public class GuiBuilder {
     }
 
     /**
-     * @param itemStack ItemStack from a GUI
-     * @return Tag or empty ArrayList if no tag was found
+     * Returns all Tags stored on a given ItemStack
+     * @param itemStack ItemStack to get tags from
+     * @return Tags or empty ArrayList if no tag was found
      */
+    @NotNull
     public ArrayList<String> getTag(ItemStack itemStack) {
         PersistentDataContainer container = Objects.requireNonNull(itemStack.getItemMeta()).getPersistentDataContainer();
         ArrayList<String> tags = new ArrayList<>();
@@ -141,6 +144,16 @@ public class GuiBuilder {
             tags.add(container.get(tagsKey, PersistentDataType.STRING));
         }
         return tags;
+    }
+
+    /**
+     * This methode returns true if a given ItemStack contains a given tag
+     * @param itemStack ItemStack to check
+     * @param tag Tag to check for
+     * @return true if ItemStack contains tag otherwise false
+     */
+    public boolean hasTag(ItemStack itemStack, String tag) {
+        return getTag(itemStack).contains(tag);
     }
 
     /**
