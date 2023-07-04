@@ -1,16 +1,30 @@
 package ch.hutch79.guibuilder;
 
+
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 public class GuiBuilder {
 
+    private static JavaPlugin pluginInstance;
+    private static NamespacedKey key;
 
-    private static final HashMap<UUID, HashMap<String, Inventory>> playerGuis = new HashMap<>();
+    public GuiBuilder(JavaPlugin javaPlugin) {
+        pluginInstance = javaPlugin;
+        key = new NamespacedKey(pluginInstance, "tag");
+    }
+
+
+    private static final HashMap<UUID, HashMap<String, Inventory>> playerInventorys = new HashMap<>();
     private static final HashMap<String, StoreGui> guis = new HashMap<>();
 
     public void createGui(String name, int guiSize) {
@@ -20,6 +34,45 @@ public class GuiBuilder {
         }
         ItemStack[] itemStack = new ItemStack[guiSize];
         guis.put(name, new StoreGui(name, guiSize, itemStack));
+    }
+
+    /**
+     * Adds an Item in a given GUI on a give Slot with a tag.
+     * @param gui Name of the GUI
+     * @param slot slot where the item should be placed in
+     * @param item Item to add on slot
+     * @param tag Tag to clearly identify the Item trough PersistentDataContainers
+     */
+    public void setItem(String gui, int slot, ItemStack item, String tag) {
+        ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
+        itemMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, tag);
+        item.setItemMeta(itemMeta);
+
+        guis.get(gui).getItems()[slot] = item;
+    }
+
+    /**
+     * Adds an Item in a given GUI on a give Slot with a tag.
+     * @param gui Name of the GUI
+     * @param slot slot where the item should be placed in
+     * @param item Item to add on slot
+     * @param tags Tags to clearly identify the Item trough PersistentDataContainers
+     */
+    public void setItem(String gui, int slot, ItemStack item, ArrayList<String> tags) {
+        ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
+        NamespacedKey listKey;
+        int i = 0;
+        for (String s : tags) {
+            i++;
+            listKey = new NamespacedKey(pluginInstance, "tag" + i);
+            itemMeta.getPersistentDataContainer().set(listKey, PersistentDataType.STRING, s);
+        }
+
+        item.setItemMeta(itemMeta);
+
+        guis.get(gui).getItems()[slot] = item;
     }
 
     /**
@@ -50,8 +103,8 @@ public class GuiBuilder {
      */
     public void openGui(Player player, String gui) {
         UUID uuid = player.getUniqueId();
-        if (playerGuis.containsKey(uuid) && playerGuis.get(uuid).containsKey(gui)) {
-            player.openInventory(playerGuis.get(uuid).get(gui));
+        if (playerInventorys.containsKey(uuid) && playerInventorys.get(uuid).containsKey(gui)) {
+            player.openInventory(playerInventorys.get(uuid).get(gui));
             return;
         }
 
@@ -62,6 +115,38 @@ public class GuiBuilder {
         temp.put(gui, inv);
 
         player.openInventory(inv);
-        playerGuis.put(uuid, temp);
+        playerInventorys.put(uuid, temp);
+    }
+
+    /**
+     * @param itemStack ItemStack from a GUI
+     * @return Tag or empty ArrayList if no tag was found
+     */
+    public ArrayList<String> getTag(ItemStack itemStack) {
+        PersistentDataContainer container = Objects.requireNonNull(itemStack.getItemMeta()).getPersistentDataContainer();
+        ArrayList<String> tags = new ArrayList<>();
+        if (container.has(key, PersistentDataType.STRING)) {
+            tags.add(container.get(key, PersistentDataType.STRING));
+            return tags;
+        }
+
+        NamespacedKey tagsKey;
+        for (int i = 1; i <= 1000; i++) {
+            tagsKey = new NamespacedKey(pluginInstance, "tag" + i);
+
+            if (!container.has(tagsKey, PersistentDataType.STRING)) {
+                return tags;
+            }
+
+            tags.add(container.get(tagsKey, PersistentDataType.STRING));
+        }
+        return tags;
+    }
+
+    /**
+     * @return NamespaceKey for PersistentDataContainer
+     */
+    public NamespacedKey getNamespacedKey() {
+        return key;
     }
 }
