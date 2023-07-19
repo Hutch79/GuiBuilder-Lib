@@ -6,7 +6,7 @@
 
     <groupId>ch.hutch79</groupId>
     <artifactId>GuiBuilder</artifactId>
-    <version>0.31-Beta</version>
+    <version>0.35-Beta</version>
     <packaging>jar</packaging>
 
     <properties>

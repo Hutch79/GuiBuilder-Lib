@@ -38,21 +38,20 @@ public class Placeholders {
                 ItemMeta itemMeta = inv.getContents()[i].getItemMeta();
 
                 assert itemMeta != null;
-                inv.getContents()[i].setItemMeta(stuff(player, itemMeta));
+                inv.getContents()[i].setItemMeta(itemMetaReplacePlaceholder(player, itemMeta));
                 continue;
             }
             SkullMeta itemMeta = (SkullMeta) inv.getContents()[i].getItemMeta();
 
             assert itemMeta != null;
-            inv.getContents()[i].setItemMeta(stuff(player, itemMeta));
+            inv.getContents()[i].setItemMeta(itemMetaReplacePlaceholder(player, itemMeta));
         }
         return inv;
     }
 
-    protected ItemMeta stuff(Player player, ItemMeta itemMeta) {
+    public ItemMeta itemMetaReplacePlaceholder(Player player, ItemMeta itemMeta) {
         assert itemMeta != null;
         itemMeta.setDisplayName(stringReplacePlaceholders(player, itemMeta.getDisplayName()));
-
         List<String> itemLore = itemMeta.getLore();
         if (itemLore != null) {
             itemLore.replaceAll(input -> stringReplacePlaceholders(player, input));

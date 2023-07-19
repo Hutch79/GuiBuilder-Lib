@@ -18,13 +18,13 @@ public class GuiBuilder {
 
     private final Placeholders placeholders = new Placeholders();
     private static JavaPlugin pluginInstance;
-    private static NamespacedKey key;
+    private static NamespacedKey keyItemID;
     private static final HashMap<UUID, HashMap<String, Inventory>> playerInventorys = new HashMap<>();
     private static final HashMap<String, StoreGui> guis = new HashMap<>();
 
     public GuiBuilder(JavaPlugin javaPlugin) {
         pluginInstance = javaPlugin;
-        key = new NamespacedKey(pluginInstance, "tag");
+        keyItemID = new NamespacedKey(pluginInstance, "itemID");
         placeholders.isPlaceholderAPI();
     }
 
@@ -54,6 +54,7 @@ public class GuiBuilder {
         assert itemMeta != null;
         NamespacedKey localKey = new NamespacedKey(pluginInstance, "tag1");
         itemMeta.getPersistentDataContainer().set(localKey, PersistentDataType.STRING, tag);
+        itemMeta.getPersistentDataContainer().set(keyItemID, PersistentDataType.INTEGER, slot);
 
         item.setItemMeta(itemMeta);
 
@@ -78,6 +79,7 @@ public class GuiBuilder {
             listKey = new NamespacedKey(pluginInstance, "tag" + i);
             itemMeta.getPersistentDataContainer().set(listKey, PersistentDataType.STRING, s);
         }
+        itemMeta.getPersistentDataContainer().set(keyItemID, PersistentDataType.INTEGER, slot);
 
         item.setItemMeta(itemMeta);
         guis.get(gui).getItems()[slot] = item;
@@ -91,6 +93,11 @@ public class GuiBuilder {
      * @param item Item to add on slot
      */
     public void setItem(String gui, int slot, ItemStack item) {
+        ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
+        itemMeta.getPersistentDataContainer().set(keyItemID, PersistentDataType.INTEGER, slot);
+        item.setItemMeta(itemMeta);
+
         guis.get(gui).getItems()[slot] = item;
     }
 
@@ -163,10 +170,34 @@ public class GuiBuilder {
         return getTag(itemStack).contains(tag);
     }
 
-    /**
-     * @return NamespaceKey for PersistentDataContainer
-     */
-    public NamespacedKey getNamespacedKey() {
-        return key;
+    public void updateItem(String gui, int itemID, Player player) {
+        UUID uuid = player.getUniqueId();
+        if (!(playerInventorys.containsKey(uuid) && playerInventorys.get(uuid).containsKey(gui))) {
+            return;
+        }
+        Inventory inv = playerInventorys.get(uuid).get(gui);
+        ItemStack[] invContents = inv.getContents();
+        ItemStack[] itemStacks = guis.get(gui).getItems();
+
+        int i = -1;
+        for (ItemStack item : invContents) {
+            i++;
+
+            if (item == null) {continue;}
+            Bukkit.getLogger().warning("Item not null");
+            if (item.getItemMeta() == null) {continue;}
+            Bukkit.getLogger().warning("ItemMeta not null");
+            if (!item.getItemMeta().getPersistentDataContainer().has(keyItemID, PersistentDataType.INTEGER)) {continue;}
+            Bukkit.getLogger().warning("DataContainer found");
+            if (item.getItemMeta().getPersistentDataContainer().get(keyItemID, PersistentDataType.INTEGER) != itemID) {continue;}
+            Bukkit.getLogger().warning("DataContainer contains correct ID");
+            if (itemStacks[i].getItemMeta() == null) {continue;}
+            Bukkit.getLogger().warning("all continues are behind us");
+            ItemMeta itemMeta = itemStacks[i].getItemMeta();
+            itemMeta = placeholders.itemMetaReplacePlaceholder(player, itemMeta);
+            Bukkit.getLogger().warning("God please work!");
+            invContents[i].setItemMeta(itemMeta);
+            inv.setContents(invContents);
+        }
     }
 }
