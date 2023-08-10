@@ -1,3 +1,6 @@
+# Please note that this Documentation is currently complete Bullshit and definitely not up to date.
+
+
 # GuiBuilder-Lib
 A simple to use GuiBuilder to implement in your Plugin
 ---
